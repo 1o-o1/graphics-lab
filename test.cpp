@@ -1,4 +1,10 @@
 #include<bits/stdc++.h>
+#include <stdio.h>
+#include <GL/glut.h>
+#include <windows.h>
+#include <mmsystem.h>
+
+
 #define b1 first.first
 #define b2 first.second
 #define b3 second.first
@@ -17,6 +23,7 @@ const int mx=1e6;
 
 double xmin,xmax,ymin,ymax;
 vector<vector<pd>> v,ans;
+vector<pd> neew;
 vector<vector<pbb>> bit;
 
 pbb bit_cal(int x,int y)
@@ -154,8 +161,269 @@ void liang(void){
 }
 
 
+int leftClip(int limit, int xmin) {
+	int i, j = 0, x1, y1, x2, y2;
+	float m;
+	for (i = 0; i < limit; i++) {
+		x1 = v[0][i].f;
+		y1 = v[0][i].s;
+		x2 = v[0][(i + 1) % limit].f;
+		y2 = v[0][(i + 1) % limit].s;
+		if (x2 - x1)
+			m = (y2 - y1) * 1.0 / (x2 - x1);
 
-int main()
+		if (x1 < xmin && x2 < xmin)
+			continue;
+		if (x1 > xmin && x2 > xmin) {
+			neew[j].f = x2;
+			neew[j++].s = y2;
+			continue;
+		}
+		if (x1 > xmin && x2 < xmin) {
+			neew[j].f = xmin;
+			neew[j++].s = y1 + m * (xmin - x1);
+			continue;
+		}
+		if (x1 < xmin && x2 > xmin) {
+			neew[j].f = xmin;
+			neew[j++].s = y1 + m * (xmin - x1);
+			neew[j].f = x2;
+			neew[j++].s = y2;
+		}
+	}
+
+	for (i = 0; i < j; i++) {
+		v[0][i].f = neew[i].f;
+		v[0][i].s = neew[i].s;
+		neew[i].f = neew[i].s = 0;
+	}
+
+	if (j < limit)
+		for (; i < limit; i++)
+			v[0][i].f = v[0][i].s = 0;
+
+	return j;
+}
+
+
+int topClip(int limit, int ymin) {
+	int i, j = 0, x1, y1, x2, y2;
+	float m;
+	for (i = 0; i < limit; i++) {
+        x1 = v[0][i].f;
+		y1 = v[0][i].s;
+		x2 = v[0][(i + 1) % limit].f;
+		y2 = v[0][(i + 1) % limit].s;
+		if (x2 - x1)
+			m = (y2 - y1) * 1.0 / (x2 - x1);
+
+		if (y1 < ymin && y2 < ymin)
+			continue;
+		if (y1 > ymin && y2 > ymin) {
+			neew[j].f = x2;
+			neew[j++].s = y2;
+			continue;
+		}
+		if (y1 > ymin && y2 < ymin) {
+			neew[j].f = x1 + (ymin - y1) / m;
+			neew[j++].s = ymin;
+			continue;
+		}
+		if (y1 < ymin && y2 > ymin) {
+			neew[j].f = x1 + (ymin - y1) / m;
+			neew[j++].s = ymin;
+			neew[j].f = x2;
+			neew[j++].s = y2;
+		}
+	}
+
+	for (i = 0; i < j; i++) {
+		v[0][i].f = neew[i].f;
+		v[0][i].s = neew[i].s;
+		neew[i].f = neew[i].s = 0;
+	}
+
+	if (j < limit)
+		for (; i < limit; i++)
+			v[0][i].f = v[0][i].s = 0;
+
+	return j;
+}
+
+int rightClip(int limit, int xmax) {
+	int i, j = 0, x1, y1, x2, y2;
+	float m;
+	for (i = 0; i < limit; i++) {
+		 x1 = v[0][i].f;
+		y1 = v[0][i].s;
+		x2 = v[0][(i + 1) % limit].f;
+		y2 = v[0][(i + 1) % limit].s;
+		if (x2 - x1)
+			m = (y2 - y1) * 1.0 / (x2 - x1);
+
+		if (x1 > xmax && x2 > xmax)
+			continue;
+		if (x1 < xmax && x2 < xmax) {
+			neew[j].f = x2;
+			neew[j++].s = y2;
+			continue;
+		}
+		if (x1 < xmax && x2 > xmax) {
+			neew[j].f = xmax;
+			neew[j++].s = y1 + m * (xmax - x1);
+			continue;
+		}
+		if (x1 > xmax && x2 < xmax) {
+			neew[j].f = xmax;
+			neew[j++].s = y1 + m * (xmax - x1);
+			neew[j].f = x2;
+			neew[j++].s = y2;
+		}
+	}
+
+	for (i = 0; i < j; i++) {
+		v[0][i].f = neew[i].f;
+		v[0][i].s = neew[i].s;
+		neew[i].f = neew[i].s = 0;
+	}
+
+	if (j < limit)
+		for (; i < limit; i++)
+			v[0][i].f = v[0][i].s = 0;
+
+	return j;
+}
+
+int bottomClip(int limit, int ymax) {
+	int i, j = 0, x1, y1, x2, y2;
+	float m;
+	for (i = 0; i < limit; i++) {
+		x1 = v[0][i].f;
+		y1 = v[0][i].s;
+		x2 = v[0][(i + 1) % limit].f;
+		y2 = v[0][(i + 1) % limit].s;
+		if (x2 - x1)
+			m = (y2 - y1) * 1.0 / (x2 - x1);
+
+		if (y1 > ymax && y2 > ymax)
+			continue;
+		if (y1 < ymax && y2 < ymax) {
+			neew[j].f = x2;
+			neew[j++].s = y2;
+			continue;
+		}
+		if (y1 < ymax && y2 > ymax) {
+			neew[j].f = x1 + (ymax - y1) / m;
+			neew[j++].s = ymax;
+			continue;
+		}
+		if (y1 > ymax && y2 < ymax) {
+			neew[j].f = x1 + (ymax - y1) / m;
+			neew[j++].s = ymax;
+			neew[j].f = x2;
+			neew[j++].s = y2;
+		}
+	}
+
+	for (i = 0; i < j; i++) {
+		v[0][i].f = neew[i].f;
+		v[0][i].s = neew[i].s;
+		neew[i].f = neew[i].s = 0;
+	}
+
+	if (j < limit)
+		for (; i < limit; i++)
+			v[0][i].f = v[0][i].s = 0;
+
+	return j;
+}
+
+int suther_poly(void)
+{
+    int result = leftClip(v[0].size(), xmin);
+
+	result = rightClip(result, xmax);
+	//result = topClip(result, ymin);
+	//result = bottomClip(result, ymax);
+    return result;
+}
+void draw_poly(int x)
+{
+    glBegin(GL_POLYGON);
+	glColor3ub(100, 200, 200);
+	for(int j=0;j<v[0].size();j++)
+	glVertex2d(v[0][j].f+x,v[0][j].s);
+	glEnd();
+}
+void draw_poly2(int n,int x)
+{
+    glBegin(GL_POLYGON);
+	glColor3ub(100, 200, 200);
+	for(int j=0;j<n;j++)
+	glVertex2d(v[0][j].f+x,v[0][j].s);
+	glEnd();
+}
+void draw_rect(int x)
+{
+    glBegin(GL_LINE_STRIP);
+    glColor3ub(200,100,100);
+    glVertex2d(xmin+x,ymin);
+    glVertex2d(xmin+x,ymax);
+    glVertex2d(xmax+x,ymax);
+    glVertex2d(xmax+x,ymin);
+    glVertex2d(xmin+x,ymin);
+    glEnd();
+}
+void drawlines()
+{
+    for(int i =0;i<v.size();i++)
+    {
+    glBegin(GL_LINE_STRIP);
+	glColor3ub(100, 200, 200);
+	glVertex2d(v[i][0].f,v[i][0].s);
+	glVertex2d(v[i][1].f,v[i][1].s);
+	glEnd();
+	}
+}
+void drawline_ans(int x)
+{
+    for(int i =0;i<ans.size();i++)
+    {
+    glBegin(GL_LINE_STRIP);
+	glColor3ub(100, 200, 200);
+	glVertex2d(ans[i][0].f+x,ans[i][0].s);
+	glVertex2d(ans[i][1].f+x,ans[i][1].s);
+	glEnd();
+	}
+}
+void myDisplay(void)
+	{
+
+             /*drawlines();
+             draw_rect(0);
+             cohen();
+             drawline_ans(2000);
+             draw_rect(2000);
+              */
+             draw_poly(0);
+             draw_rect(0);
+             int n=suther_poly();
+             draw_poly2(n,2000);
+             draw_rect(2000);
+			 glFlush();
+			 glutPostRedisplay();
+			 glutSwapBuffers();
+}
+void myInit(void)
+{
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glPointSize(0.0);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(-200.0, 4000.0, -1000.0, 2000.0);
+}
+int main(int argc, char** argv)
 {
     int i,j,n,l;
 
@@ -176,7 +444,8 @@ int main()
         shape.pbk(point);}
         v.pbk(shape);
     }
-    liang();
+    neew=v[0];
+    /*liang();
     for(i=0; ans.size(); i++)
     {
         for(j=0;j<ans[i].size();j++)
@@ -184,26 +453,45 @@ int main()
             //cout<<bit[i][j].b1<<" "<<bit[i][j].b2<<" "<<bit[i][j].b3<<" "<<bit[i][j].b4<<" : ";
             }
             cout<<endl;
-    }
+    }*/
+  	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+	glutInitWindowSize(2000, 2000);
+	glutInitWindowPosition(0, 0);
 
-    return 0;
+	glutCreateWindow("Clipping");
+	glutDisplayFunc(myDisplay);
+	myInit();
+	glutMainLoop();
+   // return 0;
 }
 /*
-1 2 9 8
+100 200 900 800
 5
 2
-3 7
-3 10
+300 700
+300 1000
 2
-2 3
-8 4
+200 300
+800 400
 2
-8 9
-6 6
+800 900
+600 600
 2
--1 7
-11 1
+-100 700
+1100 100
 2
-11 10
-11 6
+1100 1000
+1100 600
+polygon
+100 200 900 800
+1
+5
+-100 700
+300 1000
+300 700
+800 900
+1100 100
+
+
 */
