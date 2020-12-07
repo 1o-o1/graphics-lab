@@ -1,11 +1,11 @@
 #include<bits/stdc++.h>
 #define b1 first.first
-#define b1 first.second
+#define b2 first.second
 #define b3 second.first
 #define b4 second.second
 #define s second
 #define f first
-#define pb push_back
+#define pbk push_back
 
 using namespace std;
 typedef long long int ll;
@@ -18,38 +18,37 @@ const int mx=1e6;
 int xmin,xmax,ymin,ymax;
 vector<vector<pd>> v,ans;
 vector<vector<pbb>> bit;
-/**
-void bit_cal()
-{
-    for(i=0; i<li.size(); i++)
-    {
-        if(li[i].y1>ymax)
-            bit[i][0]=1;
-        if(li[i].y1<ymin)
-            bit[i][1]=1;
-        if(li[i].x1>xmax)
-            bit[i][2]=1;
-        if(li[i].x1<xmin)
-            bit[i][3]=1;
 
-        if(li[i].y2>ymax)
-            bit[i][4]=1;
-        if(li[i].y2<ymin)
-            bit[i][5]=1;
-        if(li[i].x2>xmax)
-            bit[i][6]=1;
-        if(li[i].x2<xmin)
-            bit[i][7]=1;
-    }
+pbb bit_cal(int x,int y)
+{
+     pbb tmp;
+     tmp.b1=0;tmp.b2=0;tmp.b3=0;tmp.b4=0;
+        if(y>ymax)
+            tmp.b1=1;
+        if(y<ymin)
+            tmp.b2=1;
+        if(x>xmax)
+            tmp.b3=1;
+        if(x<xmin)
+            tmp.b4=1;
+            return tmp;
 }
-//int clipable(int i)
+
+int clipable(int i)
 {
     int sum=0,andsum=0;
-    for(j=0; j<4; j++)
-    {
-        sum+=(bit[i][j]+bit[i][j+4]);
-        andsum+=(bit[i][j]&bit[i][j+4]);
-    }
+
+        sum+=(bit[i][0].b1+bit[i][1].b1);
+        andsum+=(bit[i][0].b1&bit[i][1].b1);
+
+        sum+=(bit[i][0].b2+bit[i][1].b2);
+        andsum+=(bit[i][0].b2&bit[i][1].b2);
+
+        sum+=(bit[i][0].b3+bit[i][1].b3);
+        andsum+=(bit[i][0].b3&bit[i][1].b3);
+
+        sum+=(bit[i][0].b4+bit[i][1].b4);
+        andsum+=(bit[i][0].b4&bit[i][1].b4);
     if(sum==0)
         return 0;
     else if(andsum==0)
@@ -57,36 +56,98 @@ void bit_cal()
     else
         return -1;
 }
+void bit_init(void)
+{
+    int i,j;
+for(i=0;i<v.size();i++)
+{
+    vector<pbb> bit2;
+    for(j=0;j<v[i].size();j++)
+    {
+        pbb tmp;
+        tmp=bit_cal(v[i][j].f,v[i][j].s);
+        bit2.pbk(tmp);
+    }
+    bit.pbk(bit2);
+}
+
+}
 void cohen(void)
 {
+    bit_init();
+    int i,j;
+    for(i=0;i<v.size();i++)
+    {
+        if(clipable(i)==0)
+            ans.push_back(v[i]);
+        else if(clipable(i)==1)
+        {
+            double m=(v[i][0].s-v[i][1].s)/(v[i][0].f-v[i][1].f);
+            for(j=0;j<v[i].size();j++)
+            {
+                int f=0;
+                if(bit[i][j].b1)
+                   {v[i][j].s=ymax;f=1;}
+                if(bit[i][j].b2)
+                    {v[i][j].s=ymin;f=1;}
+                if(bit[i][j].b3)
+                    {v[i][j].f=xmax;f=2;}
+                if(bit[i][j].b4)
+                   {v[i][j].s=xmin;f=2;}
 
-}**/
+                if(f==2)
+                    v[i][j].s=v[i][j].s+m*((v[i][0].f-v[i][1].f));
+                if(f==1)
+                    v[i][j].f=v[i][j].f+((v[i][0].s-v[i][1].s))/m;
+
+            }
+            ans.push_back(v[i]);
+        }
+    }
+}
 int main()
 {
     int i,j,n,l;
 
-    cout<<"Enter clip window\n"; ///"change it"
-    cin>>xmin>>xmax>>ymin>>ymax;
+    cout<<"Enter clip window xmin ymin xmax ymax\n"; ///"change it"
+    cin>>xmin>>ymin>>xmax>>ymax;
+
     cout<<"Enter number of shape\n";///"change it"
     cin>>n;
 
     for (i=0; i<n; i++)
     {
-        cout<<"enter number of vertex\n";
+        cout<<"enter number of vertex and them n x y\n";
         cin>>l;
         pd point;
         vector<pd> shape;
         for(j=0;j<l;j++)
         {cin>>point.f>>point.s;
-        shape.pb(point);}
-        v.pb(shape);
+        shape.pbk(point);}
+        v.pbk(shape);
     }
-    for(i=0; v.size(); i++)
+    cohen();
+    for(i=0; ans.size(); i++)
     {
-        for(j=0;j<v[i].size();j++)
-            cout<<v[i][j].f<<" "<<v[i][j].s<<" : ";
+        for(j=0;j<ans[i].size();j++)
+            {cout<<ans[i][j].f<<" "<<ans[i][j].s<<" : ";
+            cout<<bit[i][j].b1<<" "<<bit[i][j].b2<<" "<<bit[i][j].b3<<" "<<bit[i][j].b4<<" : ";
+            }
             cout<<endl;
     }
 
     return 0;
 }
+/*
+1 2 9 8
+3
+2
+3 7
+3 10
+2
+11 10
+11 6
+2
+-1 7
+11 1
+*/
