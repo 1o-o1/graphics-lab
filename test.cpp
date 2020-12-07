@@ -86,7 +86,6 @@ void cohen(void)
             double x1=v[i][0].f,x2=v[i][1].f;
             double dy=y1-y2,dx=x1-x2;
             double m=dy/dx;
-            cout<<dy<<" "<<dx<<endl;
             double c=y1-m*x1;
             for(j=0;j<v[i].size();j++)
             {
@@ -103,7 +102,7 @@ void cohen(void)
                 if(bit[i][j].b4)
                    {v[i][j].f=xmin;f=2;}
                 if(f==2&&dy!=0&&dx!=0)
-                    v[i][j].s=y1+m*v[i][j].f+c;}
+                    v[i][j].s=m*v[i][j].f+c;}
 
 
             }
@@ -111,6 +110,51 @@ void cohen(void)
         }
     }
 }
+
+void liang(void){
+
+    int i,j;
+    for(i=0;i<v.size();i++)
+    {
+
+            double y1=v[i][0].s,y2=v[i][1].s;
+            double x1=v[i][0].f,x2=v[i][1].f;
+            double dy=y2-y1,dx=x2-x1;
+            double p[4]={-1*dx,dx,-1*dy,dy},r[4],u1=0,u2=1;
+            double q[4]={x1-xmin,xmax-x1,y1-ymin,ymax-y1};
+             bool f=0;
+            for(j=0;j<4;j++)
+             {
+                 //cout<<p[j]<<" "<<q[j]<<endl;
+                 if(p[j]==0&&q[j]<0)
+                 {
+                     f=1;break;
+                 }
+                 else if(p[j]<0)
+                 {
+                     r[j]=q[j]/p[j];
+                     u1=max(u1,r[j]);
+                 }
+                 else if(p[j]>0)
+                 {
+                     r[j]=q[j]/p[j];
+                     u2=min(u2,r[j]);
+                 }
+
+             }
+             if(u1<=u2&&!f)
+             {
+                 v[i][0].f=x1+dx*u1;
+                 v[i][0].s=y1+dy*u1;
+                 v[i][1].f=x1+dx*u2;
+                 v[i][1].s=y1+dy*u2;
+                 ans.push_back(v[i]);
+             }
+        }
+}
+
+
+
 int main()
 {
     int i,j,n,l;
@@ -132,7 +176,7 @@ int main()
         shape.pbk(point);}
         v.pbk(shape);
     }
-    cohen();
+    liang();
     for(i=0; ans.size(); i++)
     {
         for(j=0;j<ans[i].size();j++)
@@ -146,7 +190,7 @@ int main()
 }
 /*
 1 2 9 8
-3
+5
 2
 3 7
 3 10
@@ -156,4 +200,10 @@ int main()
 2
 8 9
 6 6
+2
+-1 7
+11 1
+2
+11 10
+11 6
 */
