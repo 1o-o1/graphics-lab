@@ -15,7 +15,7 @@ typedef pair<pb,pb> pbb;
 const int mx=1e6;
 
 
-int xmin,xmax,ymin,ymax;
+double xmin,xmax,ymin,ymax;
 vector<vector<pd>> v,ans;
 vector<vector<pbb>> bit;
 
@@ -82,7 +82,12 @@ void cohen(void)
             ans.push_back(v[i]);
         else if(clipable(i)==1)
         {
-            double m=(v[i][0].s-v[i][1].s)/(v[i][0].f-v[i][1].f);
+            double y1=v[i][0].s,y2=v[i][1].s;
+            double x1=v[i][0].f,x2=v[i][1].f;
+            double dy=y1-y2,dx=x1-x2;
+            double m=dy/dx;
+            cout<<dy<<" "<<dx<<endl;
+            double c=y1-m*x1;
             for(j=0;j<v[i].size();j++)
             {
                 int f=0;
@@ -90,15 +95,16 @@ void cohen(void)
                    {v[i][j].s=ymax;f=1;}
                 if(bit[i][j].b2)
                     {v[i][j].s=ymin;f=1;}
+                if(f==1&&dy!=0&&dx!=0)
+                    v[i][j].f=(v[i][j].s-c)/m;
+                else{
                 if(bit[i][j].b3)
                     {v[i][j].f=xmax;f=2;}
                 if(bit[i][j].b4)
-                   {v[i][j].s=xmin;f=2;}
+                   {v[i][j].f=xmin;f=2;}
+                if(f==2&&dy!=0&&dx!=0)
+                    v[i][j].s=y1+m*v[i][j].f+c;}
 
-                if(f==2)
-                    v[i][j].s=v[i][j].s+m*((v[i][0].f-v[i][1].f));
-                if(f==1)
-                    v[i][j].f=v[i][j].f+((v[i][0].s-v[i][1].s))/m;
 
             }
             ans.push_back(v[i]);
@@ -131,7 +137,7 @@ int main()
     {
         for(j=0;j<ans[i].size();j++)
             {cout<<ans[i][j].f<<" "<<ans[i][j].s<<" : ";
-            cout<<bit[i][j].b1<<" "<<bit[i][j].b2<<" "<<bit[i][j].b3<<" "<<bit[i][j].b4<<" : ";
+            //cout<<bit[i][j].b1<<" "<<bit[i][j].b2<<" "<<bit[i][j].b3<<" "<<bit[i][j].b4<<" : ";
             }
             cout<<endl;
     }
@@ -145,9 +151,9 @@ int main()
 3 7
 3 10
 2
-11 10
-11 6
+2 3
+8 4
 2
--1 7
-11 1
+8 9
+6 6
 */
