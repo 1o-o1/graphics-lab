@@ -1,4 +1,4 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 #include <stdio.h>
 #include <GL/glut.h>
 #include <windows.h>
@@ -346,7 +346,7 @@ void drawlines()
 {
     for(int i =0;i<v.size();i++)
     {
-    glBegin(GL_LINE_STRIP);
+        glBegin(GL_LINE_STRIP);
 	glColor3ub(100, 200, 200);
 	glVertex2d(v[i][0].f,v[i][0].s);
 	glVertex2d(v[i][1].f,v[i][1].s);
@@ -357,7 +357,7 @@ void drawline_ans(int x)
 {
     for(int i =0;i<ans.size();i++)
     {
-    glBegin(GL_LINE_STRIP);
+        glBegin(GL_LINE_STRIP);
 	glColor3ub(100, 200, 200);
 	glVertex2d(ans[i][0].f+x,ans[i][0].s);
 	glVertex2d(ans[i][1].f+x,ans[i][1].s);
@@ -473,6 +473,7 @@ Line
 200 -500 200 500
 2
 200 800 800 200
+
 Polygon
 100 100 900 900
 1
